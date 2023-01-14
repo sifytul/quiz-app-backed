@@ -1,9 +1,7 @@
 import bcrypt from "bcrypt";
-import { verify } from "crypto";
 import express, { Router } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import User from "../dbModels/userModel";
-import verifyJWT from "../middlewares/verifyJWT";
 
 const authRouter = Router();
 
@@ -16,7 +14,7 @@ authRouter.post(
   "/signup",
   async (req: express.Request, res: express.Response) => {
     try {
-      const { username, email, password, school } = req.body;
+      const { name, email, password, school } = req.body;
       const isUser = await User.findOne({ email }).lean().exec();
       if (isUser) {
         return res.status(400).json({ message: "User already exists" });
@@ -25,7 +23,7 @@ authRouter.post(
       const hashedPass = await bcrypt.hash(password, salt);
       const newUser = await User.create({
         userId: genUUID.next().value,
-        username,
+        name,
         email,
         password: hashedPass,
       });
@@ -33,7 +31,7 @@ authRouter.post(
       // delete user._doc.password
       const userDetails = {
         userId: newUser?.userId,
-        username: newUser?.username,
+        name: newUser?.name,
         email: newUser?.email,
         school: newUser?.school,
       };
@@ -71,7 +69,7 @@ authRouter.post(
 
       let userDetails = {
         userId: isUser.userId,
-        username: isUser.username,
+        name: isUser.name,
         email: isUser.email,
         school: isUser.school,
       };
@@ -80,12 +78,12 @@ authRouter.post(
         userDetails,
         `${process.env.JWT_ACCESS_TOKEN_SECRET}`,
         {
-          expiresIn: "1m",
+          expiresIn: "10m",
         }
       );
 
       const refreshToken = await jwt.sign(
-        userDetails,
+        { email: userDetails.email },
         `${process.env.JWT_REFRESH_TOKEN_SECRET}`,
         { expiresIn: "1d" }
       );
@@ -124,7 +122,7 @@ authRouter.get(
 
     let userDetails = {
       userId: foundUser?.userId,
-      username: foundUser?.username,
+      name: foundUser?.name,
       email: foundUser?.email,
       school: foundUser?.school,
     };
@@ -143,9 +141,9 @@ authRouter.get(
 // @desc logout from the website
 // @route POST /api/v1/auth/logout
 // @access - Private - user with refreshtoken can logout
-authRouter.post("/logout", verifyJWT, (req: express.Request, res: express.Response) => {
+authRouter.post("/logout", (req: express.Request, res: express.Response) => {
   res.clearCookie("jwt", { httpOnly: true, sameSite: "none", secure: true });
-  res.setHeader("Authorization", "")
+  res.setHeader("Authorization", "");
   res.status(200).json({ message: "Logged out successfully" });
 });
 

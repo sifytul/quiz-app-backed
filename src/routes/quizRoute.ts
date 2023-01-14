@@ -1,5 +1,5 @@
 import { Router } from "express";
 
-const quizRoute = Router();
+const quizRouter = Router();
 
-export default quizRoute;
+export default quizRouter;

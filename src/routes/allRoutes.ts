@@ -1,13 +1,12 @@
 import { Router } from "express";
 import authRouter from "./authRoute";
-import quizRoute from "./quizRoute";
-import userRoute from "./userRoute";
-
+import quizRouter from "./quizRoute";
+import userRouter from "./userRoute";
 
 const router = Router();
 
-router.use("/user", userRoute)
-router.use("/quiz", quizRoute)
-router.use("/auth", authRouter)
+router.use("/user", userRouter);
+router.use("/quiz", quizRouter);
+router.use("/auth", authRouter);
 
 export default router;

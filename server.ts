@@ -23,6 +23,14 @@ app.get("/", (req, res) => {
   res.send("Hello from quiz-backed");
 });
 
+app.get("/download", (req, res) => {
+  res.download("Express 5.x - API Reference.pdf");
+})
+
+app.get("/redirect", (req, res) => {
+  res.redirect("http://facebook.com");
+})
+
 mongoose.connection.once("open", () => {
   console.log("DB connected");
   app.listen(process.env.PORT || 7000, () => {
