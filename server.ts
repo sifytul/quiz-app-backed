@@ -19,17 +19,10 @@ connectDB();
 // route is use
 app.use("/api/v1", allRoutes);
 
-app.get("/", (req, res) => {
-  res.send("Hello from quiz-backed");
+app.get("/health", (req, res) => {
+  res.status(200).json({message: "Everything is allright"});
 });
 
-app.get("/download", (req, res) => {
-  res.download("Express 5.x - API Reference.pdf");
-})
-
-app.get("/redirect", (req, res) => {
-  res.redirect("http://facebook.com");
-})
 
 mongoose.connection.once("open", () => {
   console.log("DB connected");
