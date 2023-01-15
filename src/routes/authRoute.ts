@@ -8,8 +8,6 @@ import {
 
 const authRouter = Router();
 
-const genUUID = idGenerator();
-
 // @desc Sign up
 // @route POST /api/v1/auth/signup
 // @access Public - to create account
@@ -30,9 +28,4 @@ authRouter.post("/logout", logoutController);
 
 export default authRouter;
 
-// helper function
-function* idGenerator() {
-  for (let i = 1; i < 10; i++) {
-    yield i;
-  }
-}
+

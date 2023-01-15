@@ -13,14 +13,16 @@ async function getIndividualUserByNameController(
   res: express.Response
 ) {
   try {
-    const name = req.params.name;
-    let user = await User.findOne({ name });
+    const username = req.params.username;
+    let user = await User.findOne({ username });
     if (!user) {
       return res.status(400).json({ message: "Wrong credentials" });
     }
     let userDetails = {
-      userId: user.userId,
-      name: user.name,
+      userId: user._id,
+      name: user.fullName,
+      username: user.username,
+      school: user.school,
       email: user.email,
     };
 
@@ -45,13 +47,13 @@ async function updateUserByIdController(
       .status(400)
       .json({ message: "Required can't be remained empty!" });
   }
-  const id = req.params.id;
+  const username = req.params.username;
 
-  const foundUser = await User.findById({ _id: id });
+  const foundUser = await User.findById({ username });
   if (!foundUser) {
     return res.status(400).json({ message: "User not available" });
   }
-  foundUser.name = name;
+  foundUser.fullName = name;
   foundUser.school = school;
 
   let updatedUser = await foundUser.save();

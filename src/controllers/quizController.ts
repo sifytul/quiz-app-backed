@@ -21,10 +21,16 @@ async function postChaptersController(
   res: express.Response
 ) {
   try {
-    const chapter = await Chapter.create({
-      ...req.body,
+    const { subject, subject_image, chapter } = req.body;
+    if (!subject || !chapter) {
+      return res.status(400).json({message: "Required field must be filled"})
+    }
+    const newChapter = await Chapter.create({
+      subject,
+      subject_image,
+      chapter,
     });
-    res.status(201).json({ message: "success", chapter });
+    res.status(201).json({ message: "success", newChapter });
   } catch (err) {
     console.log(err);
   }
@@ -49,9 +55,14 @@ async function postQuizInChapterByIdController(
   res: express.Response
 ) {
   try {
+    const { title, options } = req.body;
+    if (!title || !options) {
+      return res.status(400).json({ message: "Required field must be filled" });
+    }
     const chapterId = req.params.chapterId;
     const quiz = await Quiz.create({
-      ...req.body,
+      title,
+      options,
       chapterId: chapterId,
     });
 
@@ -71,5 +82,5 @@ export {
   getChaptersController,
   postChaptersController,
   getQuizOfChapterByIdController,
-  postQuizInChapterByIdController
-}
+  postQuizInChapterByIdController,
+};

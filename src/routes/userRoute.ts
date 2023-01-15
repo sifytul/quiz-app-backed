@@ -15,11 +15,11 @@ userRouter.get("/alluser", getAllUsersController);
 // @desc- get individual user by name
 // @route - GET /api/v1/user/:name
 // @access - Private
-userRouter.get("/:name", getIndividualUserByNameController);
+userRouter.get("/:username", getIndividualUserByNameController);
 
 // @route - PATCH /api/v1/user/:id
 // @access - Private
-userRouter.patch("/:id", updateUserByIdController);
+userRouter.patch("/:username", updateUserByIdController);
 
 // @route - DELETE /api/v1/user/:id
 // @access - Private

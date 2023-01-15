@@ -9,23 +9,31 @@ async function createUserController(
   res: express.Response
 ) {
   try {
-    const { name, email, password, school } = req.body;
+    const { name, email, username, password, school } = req.body;
+    if (!name || !username || !email || !password) {
+      return res.status(400).json({ message: "Required field must be filled" });
+    }
     const isUser = await User.findOne({ email }).lean().exec();
+    const username_existed = await User.findOne({ username });
+    if (username_existed) {
+      return res.status(400).json({ message: "Choose another username" });
+    }
     if (isUser) {
       return res.status(400).json({ message: "User already exists" });
     }
     const salt = await bcrypt.genSalt(10);
     const hashedPass = await bcrypt.hash(password, salt);
     const newUser = await User.create({
-      userId: genUUID.next().value,
-      name,
+      fullName: name,
+      username,
       email,
       password: hashedPass,
+      school,
     });
     // delete user._doc.password
     const userDetails = {
-      userId: newUser?.userId,
-      name: newUser?.name,
+      userId: newUser?._id,
+      name: newUser?.fullName,
       email: newUser?.email,
       school: newUser?.school,
     };
@@ -40,11 +48,8 @@ async function createUserController(
 async function signInController(req: express.Request, res: express.Response) {
   try {
     const { email, password } = req.body;
-
     if (!email || !password) {
-      return res
-        .status(400)
-        .json({ message: "Empty fields are not acceptable" });
+      return res.status(400).json({ message: "Required field must be filled" });
     }
 
     const isUser = await User.findOne({ email });
@@ -57,8 +62,8 @@ async function signInController(req: express.Request, res: express.Response) {
     }
 
     let userDetails = {
-      userId: isUser.userId,
-      name: isUser.name,
+      userId: isUser._id,
+      name: isUser.fullName,
       email: isUser.email,
       school: isUser.school,
     };
@@ -106,8 +111,8 @@ async function refreshController(req: express.Request, res: express.Response) {
   const foundUser = await User.findOne({ email: decoded.email });
 
   let userDetails = {
-    userId: foundUser?.userId,
-    name: foundUser?.name,
+    userId: foundUser?._id,
+    name: foundUser?.fullName,
     email: foundUser?.email,
     school: foundUser?.school,
   };
